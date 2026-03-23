@@ -7,14 +7,53 @@ const searchForm = document.getElementById("search-form");
 const searchStatus = document.getElementById("search-status");
 const emptyState = document.getElementById("empty-state");
 const searchSuggestions = document.getElementById("search-suggestions");
+const categoryFilters = document.getElementById("category-filters");
+const sortSelect = document.getElementById("sort-select");
 
 const slugify = window.ByteStormCart?.slugify || ((text) => text);
 const detailLink = (product) => product.link || `produtos/produto.html?id=${slugify(product.name)}`;
 const searchPageLink = (term) => `search.html?q=${encodeURIComponent(term.trim())}`;
 
 const sortedCatalog = [...products].sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+const catalogCategories = ["Todos", ...new Set(sortedCatalog.map((product) => product.category || "Produto"))];
+
+let activeCategory = "Todos";
+let activeSort = "alphabetical";
+
+function parsePriceLabel(value = "") {
+  return Number(value.replace("R$", "").replace(/\./g, "").replace(",", ".").trim());
+}
+
+function getInstallments(product) {
+  const installmentCount = parsePriceLabel(product.price) >= 1000 ? 12 : 6;
+  const installmentValue = parsePriceLabel(product.price) / installmentCount;
+
+  return {
+    count: installmentCount,
+    value: new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    }).format(installmentValue)
+  };
+}
+
+function getRatingData(product) {
+  const base = (product.name.length % 5) + 45;
+  const rating = (base / 10).toFixed(1);
+  const reviews = 18 + (product.name.length * 3);
+
+  return { rating, reviews };
+}
+
+function createStars(rating) {
+  const roundedRating = Math.round(Number(rating));
+  return "&#9733;".repeat(roundedRating) + "&#9734;".repeat(5 - roundedRating);
+}
 
 function createPromoCard(product) {
+  const { rating, reviews } = getRatingData(product);
+  const installments = getInstallments(product);
+
   return `
     <article class="product-card">
       <img src="${product.image}" alt="${product.name}">
@@ -22,10 +61,15 @@ function createPromoCard(product) {
         <span class="product-badge">${product.badge}</span>
         <h3>${product.name}</h3>
         <p>${product.description}</p>
+        <div class="product-rating">
+          <span class="stars" aria-label="Avaliacao ${rating} de 5">${createStars(rating)}</span>
+          <span class="rating-copy">${rating} (${reviews} avaliacoes)</span>
+        </div>
         <div class="product-meta">
           <div>
             <div class="old-price">${product.oldPrice}</div>
             <div class="price">${product.price}</div>
+            <div class="installments-copy">ou ate ${installments.count}x de ${installments.value}</div>
           </div>
           <div class="product-actions">
             <button class="btn btn-secondary" type="button" data-add-to-cart="${slugify(product.name)}">Adicionar</button>
@@ -40,6 +84,8 @@ function createPromoCard(product) {
 function createCatalogCard(product) {
   const badge = product.promo ? product.badge : (product.category || "Produto");
   const oldPrice = product.promo ? `<div class="old-price">${product.oldPrice}</div>` : "";
+  const { rating, reviews } = getRatingData(product);
+  const installments = getInstallments(product);
 
   return `
     <article class="product-card catalog-card">
@@ -47,10 +93,15 @@ function createCatalogCard(product) {
       <span class="product-badge">${badge}</span>
       <h3>${product.name}</h3>
       <p>${product.description}</p>
+      <div class="product-rating">
+        <span class="stars" aria-label="Avaliacao ${rating} de 5">${createStars(rating)}</span>
+        <span class="rating-copy">${rating} (${reviews} avaliacoes)</span>
+      </div>
       <div class="catalog-meta">
-        <div>
+        <div class="card-benefits">
           ${oldPrice}
           <div class="price">${product.price}</div>
+          <div class="installments-copy">ou ate ${installments.count}x de ${installments.value}</div>
         </div>
         <div class="product-actions">
           <button class="btn btn-secondary" type="button" data-add-to-cart="${slugify(product.name)}">Adicionar</button>
@@ -65,9 +116,60 @@ function renderProducts() {
   const promoProducts = sortedCatalog.filter((product) => product.promo).slice(0, 5);
 
   promoGrid.innerHTML = promoProducts.map(createPromoCard).join("");
-  catalogGrid.innerHTML = sortedCatalog.map(createCatalogCard).join("");
-  emptyState.hidden = true;
   searchStatus.textContent = "Mostrando as melhores ofertas do dia.";
+  renderCatalog();
+}
+
+function getFilteredCatalog() {
+  let filteredProducts = [...sortedCatalog];
+
+  if (activeCategory !== "Todos") {
+    filteredProducts = filteredProducts.filter((product) => (product.category || "Produto") === activeCategory);
+  }
+
+  if (activeSort === "price-asc") {
+    filteredProducts.sort((a, b) => parsePriceLabel(a.price) - parsePriceLabel(b.price));
+  }
+
+  if (activeSort === "price-desc") {
+    filteredProducts.sort((a, b) => parsePriceLabel(b.price) - parsePriceLabel(a.price));
+  }
+
+  if (activeSort === "promo") {
+    filteredProducts = filteredProducts.filter((product) => product.promo);
+  }
+
+  return filteredProducts;
+}
+
+function renderCatalogFilters() {
+  if (!categoryFilters) {
+    return;
+  }
+
+  categoryFilters.innerHTML = catalogCategories.map((category) => `
+    <button
+      class="filter-chip ${category === activeCategory ? "active" : ""}"
+      type="button"
+      data-category-filter="${category}">
+      ${category}
+    </button>
+  `).join("");
+}
+
+function renderCatalog() {
+  if (!catalogGrid) {
+    return;
+  }
+
+  const filteredProducts = getFilteredCatalog();
+
+  catalogGrid.innerHTML = filteredProducts.map(createCatalogCard).join("");
+  emptyState.hidden = filteredProducts.length > 0;
+
+  if (!filteredProducts.length) {
+    emptyState.textContent = "Nenhum produto encontrado para os filtros selecionados.";
+  }
 }
 
 function getSuggestions(term = "") {
@@ -112,6 +214,7 @@ function renderSuggestions(term = "") {
 
 if (promoGrid && catalogGrid && searchInput && searchForm) {
   renderProducts();
+  renderCatalogFilters();
 
   searchInput.addEventListener("input", (event) => {
     renderSuggestions(event.target.value);
@@ -143,5 +246,21 @@ if (promoGrid && catalogGrid && searchInput && searchForm) {
 
   searchInput.addEventListener("focus", () => {
     renderSuggestions(searchInput.value);
+  });
+
+  categoryFilters?.addEventListener("click", (event) => {
+    const filterButton = event.target.closest("[data-category-filter]");
+    if (!filterButton) {
+      return;
+    }
+
+    activeCategory = filterButton.dataset.categoryFilter;
+    renderCatalogFilters();
+    renderCatalog();
+  });
+
+  sortSelect?.addEventListener("change", (event) => {
+    activeSort = event.target.value;
+    renderCatalog();
   });
 }

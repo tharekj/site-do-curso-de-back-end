@@ -113,6 +113,21 @@
         </div>
         <p>Todos os itens cadastrados aparecem aqui em ordem alfabetica.</p>
       </div>
+      <div class="catalog-toolbar">
+        <div class="filter-group">
+          <span class="filter-label">Categorias</span>
+          <div class="filter-chips" id="category-filters"></div>
+        </div>
+        <label class="sort-control" for="sort-select">
+          <span class="filter-label">Ordenar por</span>
+          <select id="sort-select">
+            <option value="alphabetical">Nome (A-Z)</option>
+            <option value="price-asc">Menor preco</option>
+            <option value="price-desc">Maior preco</option>
+            <option value="promo">Somente promocoes</option>
+          </select>
+        </label>
+      </div>
       <div class="catalog-grid" id="catalog-grid"></div>
       <p class="empty-state" id="empty-state" hidden>Nenhum produto encontrado para essa busca.</p>
     </section>
@@ -138,7 +153,41 @@
         <h3>Atendimento</h3>
         <p>Email: thareksouza@gmail.com</p>
         <p>WhatsApp: (65) 99918-4389</p>
+        <div class="contact-actions">
+          <a class="btn btn-primary" href="https://wa.me/5565999184389" target="_blank" rel="noopener noreferrer">Chamar no WhatsApp</a>
+          <a class="btn btn-secondary" href="mailto:thareksouza@gmail.com">Enviar email</a>
+        </div>
       </article>
+    </section>
+
+    <section class="showcase testimonials" id="depoimentos">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Quem compra recomenda</p>
+          <h2>Clientes satisfeitos com a ByteStorm</h2>
+        </div>
+        <p>Mais confianca para quem esta montando ou atualizando o setup.</p>
+      </div>
+      <div class="testimonial-grid">
+        <article class="testimonial-card">
+          <div class="testimonial-rating" aria-label="Avaliacao 5 de 5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"O headset chegou rapido, bem embalado e com qualidade acima do que eu esperava."</p>
+          <strong>Marina S.</strong>
+          <span>Compra de perifericos</span>
+        </article>
+        <article class="testimonial-card">
+          <div class="testimonial-rating" aria-label="Avaliacao 5 de 5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Consegui montar meu setup inteiro no mesmo lugar e o parcelamento ajudou muito."</p>
+          <strong>Caio R.</strong>
+          <span>Upgrade gamer</span>
+        </article>
+        <article class="testimonial-card">
+          <div class="testimonial-rating" aria-label="Avaliacao 5 de 5 estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>"Atendimento respondeu minhas duvidas sobre placa de video e me passou seguranca para comprar."</p>
+          <strong>Livia M.</strong>
+          <span>Hardware e suporte</span>
+        </article>
+      </div>
     </section>
   </main>
 
