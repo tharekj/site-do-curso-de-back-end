@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Busca | ByteStorm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand-area">
+      <a class="logo" href="index.html">ByteStorm</a>
+      <span class="brand-badge">busca</span>
+    </div>
+    <form class="search-bar" id="results-search-form">
+      <input type="text" id="results-search-input" placeholder="Pesquise produtos..." aria-label="Pesquisar produtos">
+      <button type="submit">Buscar</button>
+      <div class="search-suggestions" id="results-search-suggestions" hidden></div>
+    </form>
+    <div class="header-actions">
+      <a href="index.html#produtos">Ofertas</a>
+      <a href="index.html#catalogo">Catalogo</a>
+      <a href="index.html#carrinho" class="cart-link">Carrinho <span class="cart-count">0</span></a>
+    </div>
+  </header>
+
+  <main class="search-page">
+    <section class="search-layout">
+      <aside class="search-filter-panel">
+        <p class="eyebrow">Filtro de preco</p>
+        <h2>Refine os resultados</h2>
+        <form class="filter-form" id="price-filter-form">
+          <label class="filter-field">
+            <span>Preco minimo</span>
+            <input type="number" id="min-price" min="0" step="1" placeholder="0">
+          </label>
+          <label class="filter-field">
+            <span>Preco maximo</span>
+            <input type="number" id="max-price" min="0" step="1" placeholder="10000">
+          </label>
+          <button class="btn btn-primary" type="submit">Aplicar filtro</button>
+          <button class="btn btn-secondary" type="button" id="clear-price-filter">Limpar filtro</button>
+        </form>
+      </aside>
+
+      <section class="search-results-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Resultados da busca</p>
+            <h2 id="results-title">Produtos encontrados</h2>
+          </div>
+          <p id="results-summary">Carregando resultados...</p>
+        </div>
+        <div class="results-grid" id="results-grid"></div>
+        <p class="empty-state" id="results-empty" hidden>Nenhum produto encontrado com esses filtros.</p>
+      </section>
+    </section>
+  </main>
+
+  <script src="products-data.js"></script>
+  <script src="cart.js"></script>
+  <script src="search-results.js"></script>
+</body>
+</html>
